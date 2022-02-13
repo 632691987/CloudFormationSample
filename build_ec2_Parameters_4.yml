@@ -1,0 +1,62 @@
+Parameters:
+  # 增加代码
+  KomaVPC:
+    Description: Koma VPC
+    Type: AWS::EC2::VPC::Id
+
+  # 增加代码
+  KomaSubnetIDs:
+    Description: Koma Subnet IDs
+    Type: "List<AWS::EC2::Subnet::Id>"
+
+  KomaInstanceType:
+    Description: Select EC2 Instance Type
+    Type: String
+    Default: t2.micro
+    AllowedValues:
+      - t2.nano
+      - t2.micro
+      - t2.small
+      - t2.medium
+    ConstraintDescription: Your ec2 cost.
+
+  KomaSecurityGroupPort:
+    Description: Security Group Port (Web:80, SSH:22)
+    Type: Number
+    Default: 22
+    MinValue: 1
+    MaxValue: 1024
+
+  KomaKeyName:
+    Description: Name of EC2 KeyPair
+    Type: AWS::EC2::KeyPair::KeyName
+    ConstraintDescription: must input
+
+Resources:
+  KomaEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone:
+        { "Fn::Select": ["0", { "Fn::GetAZs": { "Ref": "AWS::Region" } }] }
+      ImageId: ami-0701e21c502689c31
+      InstanceType: !Ref KomaInstanceType
+      KeyName: !Ref KomaKeyName
+      # 增加代码
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: true
+          DeviceIndex: "0"
+          GroupSet: 
+            - !Ref KomaSecurityGroup
+          SubnetId: 
+            { "Fn::Select": ["0", !Ref KomaSubnetIDs] }
+
+  KomaSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: KomaSecurityGroupDescription
+      VpcId: !Ref KomaVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: !Ref KomaSecurityGroupPort
+          ToPort: !Ref KomaSecurityGroupPort
+          CidrIp: 0.0.0.0/0

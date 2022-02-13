@@ -1,0 +1,28 @@
+# 这里是根据默认的 'AWS::Region' 获得，不再是客户选择的
+
+Parameters:
+  KomaEnvironmentName:
+    Description: Koma Environment Name
+    Type: String
+    AllowedValues: [dev, prod]
+
+Mappings:
+  KomaEnvInstanceType:
+    dev:
+      instanceType: t2.micro
+    prod:
+      instanceType: t2.small
+  KomaRegionAMI:
+    ap-east-1:
+      amiid: ami-01cc34ab2709337aa
+    ap-northeast-1:
+      amiid: ami-02d36247c5bc58c23
+    ap-southeast-1:
+      amiid: ami-07191cf2912e097a6
+
+Resources:
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !FindInMap [KomaEnvInstanceType, !Ref 'KomaEnvironmentName', instanceType]
+      ImageId: !FindInMap [KomaRegionAMI, !Ref 'AWS::Region', amiid]

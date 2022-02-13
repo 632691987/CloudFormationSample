@@ -1,0 +1,20 @@
+# 设置 AWS 公共参数的地方, 这里不再是让客户选择常量，而是预设了变量的值
+# https://eu-west-3.console.aws.amazon.com/systems-manager/home?region=eu-west-3&tab=PublicTable#public_parameter_service=ami-amazon-linux-latest
+Parameters:
+  KomaInstanceType:
+    Description: EC2 instance type
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /deeplearnaws/ec2/instanceType
+
+  # https://eu-west-3.console.aws.amazon.com/systems-manager/parameters/aws/service/ami-amazon-linux-latest/amzn-ami-hvm-x86_64-gp2/description?region=eu-west-3&tab=PublicTable#public_parameter_service=ami-amazon-linux-latest
+  KomaAMIId:
+    Description: EC2 AMI
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/amzn-ami-hvm-x86_64-gp2
+
+Resources:
+  MyEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref KomaInstanceType
+      ImageId: !Ref KomaAMIId

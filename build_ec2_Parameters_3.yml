@@ -1,0 +1,47 @@
+Parameters:
+  KomaInstanceType:
+    Description: Select EC2 Instance Type
+    Type: String
+    Default: t2.micro
+    AllowedValues:
+      - t2.nano
+      - t2.micro
+      - t2.small
+      - t2.medium
+    ConstraintDescription: Your ec2 cost.
+
+  KomaSecurityGroupPort:
+    Description: Security Group Port (Web:80, SSH:22)
+    Type: Number
+    Default: 80
+    MinValue: 1
+    MaxValue: 1024
+
+  # 增加代码
+  KomaKeyName:
+    Description: Name of EC2 KeyPair
+    Type: AWS::EC2::KeyPair::KeyName
+    ConstraintDescription: must input
+
+Resources:
+  KomaEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone:
+        { "Fn::Select": ["0", { "Fn::GetAZs": { "Ref": "AWS::Region" } }] }
+      ImageId: ami-0701e21c502689c31
+      InstanceType: !Ref KomaInstanceType
+      SecurityGroups:
+        - !Ref KomaSecurityGroup
+      # 增加代码
+      KeyName: !Ref KomaKeyName
+
+  KomaSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: KomaSecurityGroupDescription
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: !Ref KomaSecurityGroupPort
+          ToPort: !Ref KomaSecurityGroupPort
+          CidrIp: 0.0.0.0/0

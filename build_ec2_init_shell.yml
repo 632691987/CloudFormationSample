@@ -1,0 +1,23 @@
+Resources:
+  ec2ForCloudformation:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone:
+        { "Fn::Select": ["0", { "Fn::GetAZs": { "Ref": "AWS::Region" } }] }
+      ImageId: ami-08cfb7b19d5cd546d
+      InstanceType: t2.micro
+      UserData:
+        Fn::Base64: |
+          #!/bin/bash
+          yum update -y
+          yum install -y httpd
+          amazon-linux-extras install -y php7.4
+          yum install -y php-mbstring
+          systemctl start httpd.service
+          systemctl enable httpd.service
+          usermod -a -G apache ec2-user
+          chown -R ec2-user:apache /var/www
+          chmod 2775 /var/www
+          find /var/www -type d -exec sudo chmod 2775 {} \;
+          find /var/www -type f -exec sudo chmod 0664 {} \;
+          echo "<?php echo 'Hello PHP World！'; ?>" > /var/www/html/koma.php

@@ -1,0 +1,24 @@
+Parameters:
+  AppName:
+    Description: The application name
+    Type: String
+
+Resources:
+  WebSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Sub Security group for ${AppName}
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+
+Outputs:
+  WebGroupId:
+    Value: !Ref WebSecurityGroup
+    Description: Id for the Web Security Group

@@ -1,0 +1,24 @@
+## 这里是关于 Mappings 的使用。下面那个 InstanceType: !FindInMap [KomaEnvInstanceType, !Ref 'KomaEnvironmentName', instanceType]
+## 的意思就是说，首先对应 Mappings 是 KomaEnvInstanceType (也就是相当与一个叫 KomaEnvInstanceType 的 hashmap)
+## 然后根据用户选择的 !Ref 'KomaEnvironmentName' 的值的不同，得出关于 "instanceType" 的类型
+## 例如下面，如果客户的参数选择是 prod, 那么就用 KomaEnvironmentName.get('prod').instanceType
+
+Parameters:
+  KomaEnvironmentName:
+    Description: Koma Environment Name
+    Type: String
+    AllowedValues: [dev, prod]
+
+Mappings:
+  KomaEnvInstanceType:
+    dev:
+      instanceType: t2.micro
+    prod:
+      instanceType: t2.small
+
+Resources:
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !FindInMap [KomaEnvInstanceType, !Ref 'KomaEnvironmentName', instanceType]
+      ImageId: ami-0701e21c502689c31

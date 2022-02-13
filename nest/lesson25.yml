@@ -1,0 +1,23 @@
+Parameters:
+  # Value Sample: https://deeplearnaws-cf-tpl.s3.eu-west-1.amazonaws.com/lesson25sg.yml
+  TemplateURL:
+    Description: URL of the nested stack template
+    Type: String
+
+Resources:
+  WebSecurityGroupStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      # 引用 TemplateURL
+      TemplateURL: !Ref TemplateURL
+      Parameters:
+        AppName: !Ref AWS::StackName
+      TimeoutInMinutes: 10
+
+  WebEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-0bf84c42e04519c85
+      SecurityGroupIds:
+        - !GetAtt WebSecurityGroupStack.Outputs.WebGroupId

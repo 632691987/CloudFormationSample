@@ -1,0 +1,44 @@
+Parameters:
+  # 代表在模板创建的时候提供客户选择的参数
+  KomaInstanceType:
+    Description: Select EC2 Instance Type
+    Type: String
+    Default: t2.micro
+    AllowedValues:
+      - t2.nano
+      - t2.micro
+      - t2.small
+      - t2.medium
+    ConstraintDescription: Your ec2 cost.
+
+  # 代表在模板创建的时候提供客户选择的参数
+  KomaSecurityGroupPort:
+    Description: Security Group Port (Web:80, SSH:22)
+    Type: Number
+    Default: 80
+    MinValue: 1
+    MaxValue: 1024
+
+Resources:
+  ## 代表创建一个 EC2 的 instance
+  KomaEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone:
+        { "Fn::Select": ["0", { "Fn::GetAZs": { "Ref": "AWS::Region" } }] }
+      ImageId: ami-00ae935ce6c2aa534
+      InstanceType: !Ref KomaInstanceType
+      # 增加代码
+      SecurityGroups:
+        - !Ref KomaSecurityGroup
+
+  ## 代表创建一个 Security group
+  KomaSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: KomaSecurityGroupDescription
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: !Ref KomaSecurityGroupPort
+          ToPort: !Ref KomaSecurityGroupPort
+          CidrIp: 0.0.0.0/0

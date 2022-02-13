@@ -1,0 +1,8 @@
+#https://docs.aws.amazon.com/zh_cn/AWSCloudFormation/latest/UserGuide/quickref-s3.html
+
+Resources:
+  komaS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      AccessControl: PublicRead
+      BucketName: "vincent-cloudformation-s3-created-demo1"

@@ -1,0 +1,24 @@
+## 这个模板很特殊， 你能创建 Parameters, 这个叫 KomaInstanceType 将能够让客户在上传该文件以后， AWS 会让客户选择内存的类型。
+## 客户可以看到有多少个 value 可以选择，也可以看到默认值
+
+Parameters:
+  KomaInstanceType:
+    Description: Select EC2 Instance Type
+    Type: String
+    Default: t2.micro
+    AllowedValues:
+      - t2.nano
+      - t2.micro
+      - t2.small
+      - t2.medium
+    ConstraintDescription: Your ec2 cost.
+
+Resources:
+  KomaEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone:
+        { "Fn::Select": ["0", { "Fn::GetAZs": { "Ref": "AWS::Region" } }] }
+      ImageId: ami-00ae935ce6c2aa534
+      # 引用实例参数
+      InstanceType: !Ref KomaInstanceType
